@@ -14,4 +14,4 @@
 
 ---
 
-附：《基于行块分布函数的通用网页正文抽取》是哈尔滨工业大学信息检索研究中心陈 鑫 (Xin Chen) 的研究成果，详情在这：![https://code.google.com/archive/p/cx-extractor/](https://code.google.com/archive/p/cx-extractor/)
+附：《基于行块分布函数的通用网页正文抽取》是哈尔滨工业大学信息检索研究中心陈 鑫 (Xin Chen) 的研究成果，详情在这：[https://code.google.com/archive/p/cx-extractor/](https://code.google.com/archive/p/cx-extractor/)
