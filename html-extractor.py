@@ -6,20 +6,17 @@ from bs4 import BeautifulSoup
 
 authorset = {'责任编辑', '作者'}
 
-'''
-    获取html
-'''
 def get_html(url):
+    """ 获取html """
     obj = requests.get(url)
     return obj.text
 
-'''
-    过滤各类标签
-    html_str:html字符串
-    flag:是否移除所有标签
-    return:过滤标签后的html字符串
-'''
 def filter_tags(html_str, flag):
+    """ 过滤各类标签
+    :param html_str: html字符串
+    :param flag: 是否移除所有标签
+    "return: 过滤标签后的html字符串
+    """
     html_str = re.sub('(?is)<!DOCTYPE.*?>', '', html_str)
     html_str = re.sub('(?is)<!--.*?-->', '', html_str) #remove html comment
     html_str = re.sub('(?is)<script.*?>.*?</script>', '', html_str) #remove javascript
@@ -31,12 +28,11 @@ def filter_tags(html_str, flag):
         html_str = re.sub('(?is)<.*?>', '', html_str) #remove tag
     return html_str
 
-'''
-    根据文本块密度获取正文
-    html_str:网页源代码
-    return：正文文本
-'''
 def extract_text_by_block(html_str):
+    """ 根据文本块密度获取正文
+    :param html_str: 网页源代码
+    :return: 正文文本
+    """
     html = filter_tags(html_str, True)
     lines = html.split('\n')
     blockwidth = 3
@@ -78,13 +74,12 @@ def extract_text_by_block(html_str):
             boolend = False
     return ''.join(arcticle_content)
 
-'''
-    全网页查找根据文本块密度获取的正文，获取文本父级标签内的正文，目的是提高正文准确率
-    html:网页html
-    article:根据文本块密度获取的正文
-    return:正文文本
-'''
 def extract_text_by_tag(html_str, article):
+    """ 全网页查找根据文本块密度获取的正文的位置，获取文本父级标签内的正文，目的是提高正文准确率
+    :param html: 网页html
+    :param article: 根据文本块密度获取的正文
+    :return: 正文文本
+    """
     lines = filter_tags(html_str, False)
     soup = BeautifulSoup(lines, 'lxml')
     p_list = soup.find_all('p')
@@ -96,19 +91,16 @@ def extract_text_by_tag(html_str, article):
     article_soup = BeautifulSoup(str(tuple[0]), 'xml')
     return remove_space(article_soup.text)
 
-'''
-    移除字符串中的空白字符
-'''
 def remove_space(text):
+    """ 移除字符串中的空白字符 """
     text = re.sub("[\t\r\n\f]", '', text)
     return text
 
-'''
-    抽取正文
-    html_str:网页源代码
-    return：正文文本
-'''
 def extract(url):
+    """ 抽取正文
+    :param url: 网页链接
+    :return：正文文本
+    """
     html_str = get_html(url)
     article_temp = extract_text_by_block(html_str)
     try:
