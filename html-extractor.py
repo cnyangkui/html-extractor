@@ -15,7 +15,7 @@ def filter_tags(html_str, flag):
     """ 过滤各类标签
     :param html_str: html字符串
     :param flag: 是否移除所有标签
-    "return: 过滤标签后的html字符串
+    :return: 过滤标签后的html字符串
     """
     html_str = re.sub('(?is)<!DOCTYPE.*?>', '', html_str)
     html_str = re.sub('(?is)<!--.*?-->', '', html_str) #remove html comment
