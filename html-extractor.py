@@ -4,12 +4,24 @@ import requests
 from collections import Counter
 from bs4 import BeautifulSoup
 
-authorset = {'责任编辑', '作者'}
 
 def get_html(url):
     """ 获取html """
-    obj = requests.get(url)
-    return obj.text
+    # obj = requests.get(url)
+    # return obj.text
+
+    try:
+        obj = requests.get(url)
+        code = obj.status_code
+        if code == 200:
+            # 防止中文正文乱码
+            html = obj.content
+            html_doc = str(html, 'utf-8')
+            return html_doc
+        return None
+    except:
+        return None
+
 
 def filter_tags(html_str, flag):
     """ 过滤各类标签
@@ -18,15 +30,16 @@ def filter_tags(html_str, flag):
     :return: 过滤标签后的html字符串
     """
     html_str = re.sub('(?is)<!DOCTYPE.*?>', '', html_str)
-    html_str = re.sub('(?is)<!--.*?-->', '', html_str) #remove html comment
-    html_str = re.sub('(?is)<script.*?>.*?</script>', '', html_str) #remove javascript
-    html_str = re.sub('(?is)<style.*?>.*?</style>', '', html_str) #remove css
+    html_str = re.sub('(?is)<!--.*?-->', '', html_str)  # remove html comment
+    html_str = re.sub('(?is)<script.*?>.*?</script>', '', html_str)  # remove javascript
+    html_str = re.sub('(?is)<style.*?>.*?</style>', '', html_str)  # remove css
     html_str = re.sub('(?is)<a[\t|\n|\r|\f].*?>.*?</a>', '', html_str)  # remove a
     html_str = re.sub('(?is)<li[^nk].*?>.*?</li>', '', html_str)  # remove li
-    #html_str = re.sub('&.{2,5};|&#.{2,5};', '', html_str) #remove special char
+    # html_str = re.sub('&.{2,5};|&#.{2,5};', '', html_str) #remove special char
     if flag:
-        html_str = re.sub('(?is)<.*?>', '', html_str) #remove tag
+        html_str = re.sub('(?is)<.*?>', '', html_str)  # remove tag
     return html_str
+
 
 def extract_text_by_block(html_str):
     """ 根据文本块密度获取正文
@@ -74,6 +87,7 @@ def extract_text_by_block(html_str):
             boolend = False
     return ''.join(arcticle_content)
 
+
 def extract_text_by_tag(html_str, article):
     """ 全网页查找根据文本块密度获取的正文的位置，获取文本父级标签内的正文，目的是提高正文准确率
     :param html: 网页html
@@ -91,10 +105,12 @@ def extract_text_by_tag(html_str, article):
     article_soup = BeautifulSoup(str(tuple[0]), 'xml')
     return remove_space(article_soup.text)
 
+
 def remove_space(text):
     """ 移除字符串中的空白字符 """
     text = re.sub("[\t\r\n\f]", '', text)
     return text
+
 
 def extract(url):
     """ 抽取正文
@@ -102,6 +118,8 @@ def extract(url):
     :return：正文文本
     """
     html_str = get_html(url)
+    if html_str == None:
+        return None
     article_temp = extract_text_by_block(html_str)
     try:
         article = extract_text_by_tag(html_str, article_temp)
@@ -109,7 +127,8 @@ def extract(url):
         article = article_temp
     return article
 
+
 if __name__ == '__main__':
-    url = 'http://www.sohu.com/a/205718041_267106?code=26fdeda34ae31f3cc4a38793aeaa92fa&_f=index_chan08cpc_0_0'
-    text  = extract(url)
+    url = 'http://www.eeo.com.cn/2020/0215/376405.shtml'
+    text = extract(url)
     print(text)
